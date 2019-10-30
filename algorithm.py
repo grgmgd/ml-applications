@@ -1,4 +1,3 @@
-import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -61,15 +60,26 @@ def runs():
         weights = fit(classifier, LSTerm)
         y = pred(weights)
         confusion_matrix[classifier] = y
-
-    print(confusion_matrix)
     return confusion_matrix
+
+
+def plot_cm(data):
+    rows, cols = data.shape
+    fig, ax = plt.subplots()
+    ax.imshow(data, cmap="bone_r", interpolation='nearest')
+    ax.set_xticks(np.arange(len(data)))
+    ax.set_yticks(np.arange(len(data)))
+    [ax.text(j, i, data[i, j],
+             ha="center", va="center", color="w") for i in range(rows) for j in range(cols)]
+
+    fig.tight_layout()
+    plt.savefig("Confusion.jpg")
+    plt.show()
 
 
 def main():
     confusion_matrix = runs()
-    sns.heatmap(confusion_matrix, annot=True, linewidths=.5)
-    plt.show()
+    plot_cm(confusion_matrix)
 
 
 main()

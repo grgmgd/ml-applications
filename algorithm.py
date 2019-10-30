@@ -1,58 +1,75 @@
 import seaborn as sns
-from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-from os import listdir
-from os.path import isfile, join
 
-training = "Train"
-testing = "Test"
-
-X = np.empty((2400, 785))
-
-for file in range(1, 2401):
-    path = training + "/" + str(file) + ".jpg"
-    image = np.asarray(Image.open(open(path, 'rb'))).flatten()
-    image = np.append(image, 1)
-    X[file - 1] = image
-
-XT = np.transpose(X)
-ft = np.matmul(XT, X)
-inv = np.linalg.pinv(ft)
-st = np.matmul(inv, XT)
+TRAINING_PATH = "Train"
+TESTING_PATH = "Test"
 
 
-def train(epoch):
+def load_train():
+    trainSet = np.empty((2400, 785))
+    for file in range(1, 2401):
+        path = TRAINING_PATH + "/" + str(file) + ".jpg"
+        image = plt.imread(path).flatten()
+        image = np.append(image, 1)
+        trainSet[file - 1] = image
+    return trainSet
+
+
+def load_test():
+    testSet = np.empty((200, 785))
+    for file in range(1, 201):
+        path = TESTING_PATH + "/" + str(file) + ".jpg"
+        image = plt.imread(path).flatten()
+        image = np.append(image, 1)
+        testSet[file - 1] = image
+    return testSet
+
+
+def fit(classifier, LSTerm):
     size = 240
     T = np.empty(2400)
     T.fill(-1)
-    T[size*epoch:size*(epoch + 1):1] = 1
-    weights = np.matmul(st, T)
+    T[size*classifier:size*(classifier + 1):1] = 1
+    weights = np.matmul(LSTerm, T)
     return weights
 
 
-def test(weights, epoch):
-    count = 0
-    index = 0
-    for file in range(1, 201):
-        path = testing + "/" + str(file) + ".jpg"
-        image = np.asarray(Image.open(open(path, 'rb'))).flatten()
-        image = np.append(image, 1)
-        value = np.matmul(weights, image)
-        count += 1 if value >= 0 else 0
-        if(file % 20 == 0):
-            testing_values[index][epoch] = count
-            count = 0
-            index += 1
+def pred(weights):
+    X = load_test()
+    pred = np.dot(X, weights)
+    normalizedPred = np.select(
+        [pred < 0, pred >= 0], [np.zeros_like(pred), np.ones_like(pred)])
+    groupedPred = np.reshape(normalizedPred, (10, 20))
+    return groupedPred.sum(axis=1)
+
+
+def init_least_squares(X):
+    XT = np.transpose(X)
+    temp1 = np.matmul(XT, X)
+    temp2 = np.linalg.pinv(temp1)
+    LSTerm = np.matmul(temp2, XT)
+    return LSTerm
 
 
 def runs():
-    for epoch in range(10):
-        weights = train(epoch)
-        test(weights, epoch)
+    confusion_matrix = np.empty((10, 10))
+    training = load_train()
+    LSTerm = init_least_squares(training)
+
+    for classifier in range(10):
+        weights = fit(classifier, LSTerm)
+        y = pred(weights)
+        confusion_matrix[classifier] = y
+
+    print(confusion_matrix)
+    return confusion_matrix
 
 
-testing_values = np.empty((10, 10))
-runs()
-sns.heatmap(testing_values, annot=True, linewidths=.5)
-plt.show()
+def main():
+    confusion_matrix = runs()
+    sns.heatmap(confusion_matrix, annot=True, linewidths=.5)
+    plt.show()
+
+
+main()

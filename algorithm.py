@@ -34,13 +34,14 @@ def fit(classifier, LSTerm):
     return weights
 
 
-def pred(weights):
-    X = load_test()
-    pred = np.dot(X, weights)
-    normalizedPred = np.select(
-        [pred < 0, pred >= 0], [np.zeros_like(pred), np.ones_like(pred)])
-    groupedPred = np.reshape(normalizedPred, (10, 20))
-    return groupedPred.sum(axis=1)
+def pred(weights, set):
+    weights = np.transpose(weights)
+    pred = np.dot(set, weights)
+    normalizedPred = np.zeros_like(pred)
+    normalizedPred[np.arange(len(pred)), np.argpartition(
+        pred, -1, axis=1)[:, -1]] = 1
+    normalizedPred = normalizedPred.reshape(10, 20, 10).sum(axis=1)
+    return normalizedPred
 
 
 def init_least_squares(X):
@@ -54,13 +55,15 @@ def init_least_squares(X):
 def runs():
     confusion_matrix = np.empty((10, 10))
     training = load_train()
+    testing = load_test()
     LSTerm = init_least_squares(training)
+    weights = np.empty((10, 785))
 
     for classifier in range(10):
-        weights = fit(classifier, LSTerm)
-        y = pred(weights)
-        confusion_matrix[classifier] = y
-    return confusion_matrix
+        weights[classifier] = fit(classifier, LSTerm)
+
+    y = pred(weights, testing)
+    return y
 
 
 def plot_cm(data):

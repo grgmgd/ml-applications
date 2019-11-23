@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import plot_cm
 
 TRAINING_PATH = "Train"
 TESTING_PATH = "Test"
@@ -42,20 +43,6 @@ def normal_dist(x, means, variances):
     return np.argmax(output)
 
 
-def plot_cm(data):
-    rows, cols = data.shape
-    fig, ax = plt.subplots()
-    ax.imshow(data, cmap="bone_r", interpolation='nearest')
-    ax.set_xticks(np.arange(len(data)))
-    ax.set_yticks(np.arange(len(data)))
-    [ax.text(j, i, data[i, j],
-             ha="center", va="center", color="w") for i in range(rows) for j in range(cols)]
-
-    fig.tight_layout()
-    plt.savefig("NaiveBayes_Confusion.jpg")
-    plt.show()
-
-
 def main():
     train = load_train()
     mean_values = means(train)
@@ -74,7 +61,7 @@ def main():
 
     confusion_matrix = confusion_matrix.reshape(10, 10)
 
-    plot_cm(confusion_matrix)
+    plot_cm(confusion_matrix, "NaiveBayes_Confusion.jpg")
 
 
 main()

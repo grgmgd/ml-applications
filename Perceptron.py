@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import plot_cm
 
 TRAINING_PATH = "Train"
 TESTING_PATH = "Test"
@@ -28,6 +29,7 @@ def load_test():
 
 
 def perceptron(classifier, training):
+    print(LEARNING_RATE)
     T = np.empty(2400)
     T.fill(-1)
     size = 240
@@ -53,20 +55,6 @@ def pred(weights, set):
     return normalizedPred
 
 
-def plot_cm(data, i):
-    rows, cols = data.shape
-    fig, ax = plt.subplots()
-    ax.imshow(data, cmap="bone_r", interpolation='nearest')
-    ax.set_xticks(np.arange(len(data)))
-    ax.set_yticks(np.arange(len(data)))
-    [ax.text(j, i, data[i, j],
-             ha="center", va="center", color="w") for i in range(rows) for j in range(cols)]
-
-    fig.tight_layout()
-    fileName = "Confusion" + str(i) + ".jpg"
-    plt.savefig(fileName)
-
-
 def runs():
     training = load_train()
     testing = load_test()
@@ -83,10 +71,12 @@ def runs():
 def main():
     learningRate = [1, 10**-1, 10**-2, 10**-3, 10**-
                     4, 10**-5, 10**-6, 10**-7, 10**-8, 10**-9.]
-    for i in learningRate:
-        LEARNING_RATE = i
+
+    global LEARNING_RATE
+    for n in learningRate:
+        LEARNING_RATE = n
         confusion_matrix = runs()
-        plot_cm(confusion_matrix, i)
+        plot_cm(confusion_matrix, "perceptron/Confusion" + str(n) + ".jpg")
 
 
 main()

@@ -65,13 +65,11 @@ def plot_cm(data, i):
     fig.tight_layout()
     fileName = "Confusion" + str(i) + ".jpg"
     plt.savefig(fileName)
-    # plt.show()
 
 
 def runs():
     training = load_train()
     testing = load_test()
-    #weight = [1,0,0,...,0]
     weights = np.zeros((10, 785))
     for i in weights:
         i[0] = 1

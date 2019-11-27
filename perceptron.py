@@ -18,7 +18,7 @@ def perceptron(classifier, training):
         for i in range(2400):
             weightTrans = np.transpose(weight)
             pred = np.dot(training[i], weightTrans)
-            if (((T[i] == 1) and (pred <= 0)) or ((T[i] == -1) and (pred > 0))):
+            if (((T[i] == 1) and (pred < 0)) or ((T[i] == -1) and (pred >= 0))):
                 weight += training[i]*LEARNING_RATE*T[i]
     return weight
 

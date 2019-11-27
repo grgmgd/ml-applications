@@ -13,3 +13,21 @@ def plot_cm(data, filepath):
 
     fig.tight_layout()
     plt.savefig(filepath)
+
+
+def load_train(TRAINING_PATH, size):
+    trainSet = np.empty(size)
+    for file in range(1, size[0] + 1):
+        path = TRAINING_PATH + "/" + str(file) + ".jpg"
+        image = plt.imread(path).flatten()
+        trainSet[file - 1] = image
+    return trainSet
+
+
+def load_test(TESTING_PATH, size):
+    testSet = np.empty(size)
+    for file in range(1, size[0] + 1):
+        path = TESTING_PATH + "/" + str(file) + ".jpg"
+        image = plt.imread(path).flatten()
+        testSet[file - 1] = image
+    return testSet

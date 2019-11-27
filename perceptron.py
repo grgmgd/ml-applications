@@ -1,35 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import plot_cm
+from utils import load_train, load_test, plot_cm
 
 TRAINING_PATH = "Train"
 TESTING_PATH = "Test"
 LEARNING_RATE = 1
-YESPRINT = True
-
-
-def load_train():
-    trainSet = np.empty((2400, 785))
-    for file in range(1, 2401):
-        path = TRAINING_PATH + "/" + str(file) + ".jpg"
-        image = plt.imread(path).flatten()
-        image = np.append(image, 1)
-        trainSet[file - 1] = image
-    return trainSet
-
-
-def load_test():
-    testSet = np.empty((200, 785))
-    for file in range(1, 201):
-        path = TESTING_PATH + "/" + str(file) + ".jpg"
-        image = plt.imread(path).flatten()
-        image = np.append(image, 1)
-        testSet[file - 1] = image
-    return testSet
 
 
 def perceptron(classifier, training):
-    print(LEARNING_RATE)
     T = np.empty(2400)
     T.fill(-1)
     size = 240
@@ -56,8 +34,10 @@ def pred(weights, set):
 
 
 def runs():
-    training = load_train()
-    testing = load_test()
+    training = np.append(load_train(
+        TRAINING_PATH, (2400, 784)), np.ones((2400, 1)), axis=1)
+    testing = np.append(load_test(TESTING_PATH, (200, 784)),
+                        np.ones((200, 1)), axis=1)
     weights = np.zeros((10, 785))
     for i in weights:
         i[0] = 1
@@ -76,7 +56,8 @@ def main():
     for n in learningRate:
         LEARNING_RATE = n
         confusion_matrix = runs()
-        plot_cm(confusion_matrix, "perceptron/Confusion" + str(n) + ".jpg")
+        plot_cm(confusion_matrix,
+                "confusion/perceptron/Confusion" + str(n) + ".jpg")
 
 
 main()

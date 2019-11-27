@@ -1,27 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import plot_cm
+from utils import load_train, load_test, plot_cm
 
 TRAINING_PATH = "Train"
 TESTING_PATH = "Test"
-
-
-def load_train():
-    trainSet = np.empty((2400, 784))
-    for file in range(1, 2401):
-        path = TRAINING_PATH + "/" + str(file) + ".jpg"
-        image = plt.imread(path).flatten()
-        trainSet[file - 1] = np.divide(image, 255)
-    return trainSet
-
-
-def load_test():
-    testSet = np.empty((200, 784))
-    for file in range(1, 201):
-        path = TESTING_PATH + "/" + str(file) + ".jpg"
-        image = plt.imread(path).flatten()
-        testSet[file - 1] = np.divide(image, 255)
-    return testSet
 
 
 def means(set):
@@ -44,10 +26,11 @@ def normal_dist(x, means, variances):
 
 
 def main():
-    train = load_train()
+    train = np.divide(load_train(TRAINING_PATH, (2400, 784)), 255)
+    test = np.divide(load_test(TESTING_PATH, (200, 784)), 255)
+
     mean_values = means(train)
     variance_values = variances(mean_values, train)
-    test = load_test()
 
     output = np.zeros(200)
     for i in range(len(test)):
@@ -61,7 +44,7 @@ def main():
 
     confusion_matrix = confusion_matrix.reshape(10, 10)
 
-    plot_cm(confusion_matrix, "NaiveBayes_Confusion.jpg")
+    plot_cm(confusion_matrix, "confusion/naive_bayes/Confusion.jpg")
 
 
 main()

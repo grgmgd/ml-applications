@@ -1,28 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import load_train, load_test, plot_cm
 
 TRAINING_PATH = "Train"
 TESTING_PATH = "Test"
-
-
-def load_train():
-    trainSet = np.empty((2400, 785))
-    for file in range(1, 2401):
-        path = TRAINING_PATH + "/" + str(file) + ".jpg"
-        image = plt.imread(path).flatten()
-        image = np.append(image, 1)
-        trainSet[file - 1] = image
-    return trainSet
-
-
-def load_test():
-    testSet = np.empty((200, 785))
-    for file in range(1, 201):
-        path = TESTING_PATH + "/" + str(file) + ".jpg"
-        image = plt.imread(path).flatten()
-        image = np.append(image, 1)
-        testSet[file - 1] = image
-    return testSet
 
 
 def fit(classifier, LSTerm):
@@ -54,8 +35,10 @@ def init_least_squares(X):
 
 def runs():
     confusion_matrix = np.empty((10, 10))
-    training = load_train()
-    testing = load_test()
+    training = np.append(load_train(
+        TRAINING_PATH, (2400, 784)), np.ones((2400, 1)), axis=1)
+    testing = np.append(load_test(TESTING_PATH, (200, 784)),
+                        np.ones((200, 1)), axis=1)
     LSTerm = init_least_squares(training)
     weights = np.empty((10, 785))
 
@@ -66,23 +49,9 @@ def runs():
     return y
 
 
-def plot_cm(data):
-    rows, cols = data.shape
-    fig, ax = plt.subplots()
-    ax.imshow(data, cmap="bone_r", interpolation='nearest')
-    ax.set_xticks(np.arange(len(data)))
-    ax.set_yticks(np.arange(len(data)))
-    [ax.text(j, i, data[i, j],
-             ha="center", va="center", color="w") for i in range(rows) for j in range(cols)]
-
-    fig.tight_layout()
-    plt.savefig("Confusion.jpg")
-    plt.show()
-
-
 def main():
     confusion_matrix = runs()
-    plot_cm(confusion_matrix)
+    plot_cm(confusion_matrix, "confusion/least_squares/Confusion.jpg")
 
 
 main()

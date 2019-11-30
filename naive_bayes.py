@@ -11,7 +11,7 @@ def means(set):
 
 
 def variances(means, set):
-    output = np.square(set.reshape(10, 240, 784).std(axis=1))
+    output = set.reshape(10, 240, 784).var(axis=1)
     output[output < 0.01] = 0.01
     return output
 

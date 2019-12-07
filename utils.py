@@ -31,3 +31,16 @@ def load_test(TESTING_PATH, size):
         image = plt.imread(path).flatten()
         testSet[file - 1] = image
     return testSet
+
+
+def most_frequet(set):
+    cuts = np.array([])
+    for i in range(set.shape[0]):
+        slice = set[i]
+        for value in cuts:
+            slice = slice[slice != value]
+        if(slice.size == 0):
+            continue
+        value = np.bincount(slice).argmax()
+        cuts = np.append(cuts, value)
+    return cuts
